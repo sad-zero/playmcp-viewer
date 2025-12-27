@@ -1,0 +1,22 @@
+{
+  "$schema": "https://gofastmcp.com/public/schemas/fastmcp.json/v1.json",
+  "source": {
+    "type": "filesystem",
+    "path": "src/playmcp_viewer/app.py",
+    "entrypoint": "mcp"
+  },
+  "deployment": {
+    "cwd": ".",
+    "port": "8000",
+    "host": "0.0.0.0",
+    "transport": "http",
+    "log_level": "INFO",
+    "env": {
+        "ENVIRONMENT": "local",
+        "FASTMCP_STATELESS_HTTP": "true"
+    },
+    "args": [
+      "--log_config", "logging.yaml"
+    ]
+  }
+}
