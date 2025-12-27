@@ -3,6 +3,7 @@ name = "playmcp-viewer"
 version = "0.1.0"
 description = "PlayMCP Viewer."
 readme = "README.md"
+license = { text = "MIT" }
 authors = [
     { name = "yeongro", email = "zeroro.yun@gmail.com" }
 ]
