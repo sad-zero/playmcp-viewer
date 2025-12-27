@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "dependency-injector>=4.48.3",
     "fastmcp>=2.14.1,<3",
     "httpx>=0.28.1",
     "pydantic>=2.12.5",
