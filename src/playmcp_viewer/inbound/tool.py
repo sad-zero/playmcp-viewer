@@ -1,3 +1,4 @@
+import asyncio
 from typing import Literal
 from fastmcp import FastMCP
 from fastmcp.server.context import Context
@@ -58,6 +59,8 @@ async def find_mcp_servers(
         if page + 1 == playmcp_resp.total_pages:
             break
         page += 1
+
+        await asyncio.sleep(0.5)
 
     await ctx.report_progress(
         progress=len(playmcp_contents),
