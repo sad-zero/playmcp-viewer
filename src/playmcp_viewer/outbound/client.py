@@ -1,6 +1,5 @@
 import httpx
 import logging
-from typing import Literal
 
 from playmcp_viewer.config import Settings
 from playmcp_viewer.outbound.dto import PlaymcpListResponse
@@ -50,7 +49,7 @@ async def get_playmcp_list(
         "response is converted",
         extra={
             "trace_id": trace_id,
-            "response": resp,
+            "response": resp.model_dump(),
         },
     )
     return resp
