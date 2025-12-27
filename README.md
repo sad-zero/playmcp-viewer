@@ -67,6 +67,7 @@
 예시:
    ```env
    KAKAO_PLAYMCP_ENDPOINT=https://playmcp.kakao.com
+   TOOL_CALL_LIMIT_PER_SECOND=1
    ```
 
 - 서버 시작하기  
