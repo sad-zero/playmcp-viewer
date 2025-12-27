@@ -12,7 +12,7 @@ logger = logging.getLogger("playmcp_viewer.outbound")
 
 async def get_playmcp_list(
     trace_id: str,
-    sort_by: Literal["TOOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
+    sort_by: str,
     page: int = 0,
 ) -> list[PlaymcpListResponse]:
     params = {
@@ -20,7 +20,7 @@ async def get_playmcp_list(
         "pageSize": 12,
         "sortBy": sort_by,
     }
-    path = "/mcps"
+    path = "/api/v1/mcps"
     async with httpx.AsyncClient(base_url=settings.kakao_playmcp_endpoint) as client:
         client_resp = await client.get(url=path, params=params)
         if client_resp.is_success:
