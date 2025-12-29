@@ -15,7 +15,7 @@ mcp: FastMCP = DIContainer().mcp()
 
 
 async def find_mcp_servers(
-    cond: Literal["TOOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
+    cond: Literal["TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
     order_by: Literal["asc", "desc"],
     top_n: int,
     ctx: Context = CurrentContext(),
@@ -24,7 +24,7 @@ async def find_mcp_servers(
     Retrieve a list of MCP servers registered on the Kakao PlayMCP platform, sorted by the specified condition and order.
 
     Tool Parameters:
-        cond: The field to sort by. One of "TOOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", or "CREATED_AT".
+        cond: The field to sort by. One of "TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", or "CREATED_AT".
         order_by: Sorting direction. Must be "asc" for ascending or "desc" for descending.
         top_n: Number of top MCP servers to return.
 
@@ -42,12 +42,6 @@ async def find_mcp_servers(
     page: int = 0
     playmcp_contents: list[PlaymcpListContentResponse] = []
     while True:
-        await ctx.info(
-            f"search {page} page",
-            extra={"page": page, "cond": cond, "order_by": order_by},
-        )
-        await ctx.report_progress(progress=len(playmcp_contents))
-
         playmcp_resp: PlaymcpListResponse = await get_playmcp_list(
             trace_id=ctx.request_id,
             page=page,
@@ -60,31 +54,11 @@ async def find_mcp_servers(
             break
         page += 1
 
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
 
-    await ctx.report_progress(
-        progress=len(playmcp_contents),
-        total=len(playmcp_contents),
-    )
-
-    await ctx.info(
-        f"sort searched servers by {order_by} direction",
-        extra={
-            "cond": cond,
-            "order_by": order_by,
-        },
-    )
     if order_by == "asc":
         playmcp_contents = playmcp_contents[::-1]
 
-    await ctx.info(
-        f"filter searched servers by {top_n} count",
-        extra={
-            "cond": cond,
-            "order_by": order_by,
-            "top_n": top_n,
-        },
-    )
     playmcp_contents = playmcp_contents[:top_n]
 
     resp = [

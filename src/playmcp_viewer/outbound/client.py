@@ -13,10 +13,10 @@ async def get_playmcp_list(
     trace_id: str,
     sort_by: str,
     page: int = 0,
-) -> list[PlaymcpListResponse]:
+) -> PlaymcpListResponse:
     params = {
         "page": page,
-        "pageSize": 12,
+        "pageSize": 50,
         "sortBy": sort_by,
     }
     path = "/api/v1/mcps"
@@ -40,9 +40,10 @@ async def get_playmcp_list(
                     "base_url": settings.kakao_playmcp_endpoint,
                     "path": path,
                     "params": params,
+                    "response": client_resp.text,
                 },
             )
-            return []
+            raise RuntimeError("request fails")
 
         resp = PlaymcpListResponse.model_validate(client_resp.json())
     logger.info(
