@@ -42,12 +42,6 @@ async def find_mcp_servers(
     page: int = 0
     playmcp_contents: list[PlaymcpListContentResponse] = []
     while True:
-        await ctx.info(
-            f"search {page} page",
-            extra={"page": page, "cond": cond, "order_by": order_by},
-        )
-        await ctx.report_progress(progress=len(playmcp_contents))
-
         playmcp_resp: PlaymcpListResponse = await get_playmcp_list(
             trace_id=ctx.request_id,
             page=page,
@@ -62,29 +56,9 @@ async def find_mcp_servers(
 
         await asyncio.sleep(0.1)
 
-    await ctx.report_progress(
-        progress=len(playmcp_contents),
-        total=len(playmcp_contents),
-    )
-
-    await ctx.info(
-        f"sort searched servers by {order_by} direction",
-        extra={
-            "cond": cond,
-            "order_by": order_by,
-        },
-    )
     if order_by == "asc":
         playmcp_contents = playmcp_contents[::-1]
 
-    await ctx.info(
-        f"filter searched servers by {top_n} count",
-        extra={
-            "cond": cond,
-            "order_by": order_by,
-            "top_n": top_n,
-        },
-    )
     playmcp_contents = playmcp_contents[:top_n]
 
     resp = [
