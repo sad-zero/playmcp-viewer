@@ -60,7 +60,7 @@ async def find_mcp_servers(
             break
         page += 1
 
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
 
     await ctx.report_progress(
         progress=len(playmcp_contents),

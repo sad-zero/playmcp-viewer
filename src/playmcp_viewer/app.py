@@ -49,9 +49,7 @@ def mcp() -> FastMCP:
             include_payloads=True,
         )
     )
-    mcp.add_middleware(
-        ResponseCachingMiddleware()
-    )
+    mcp.add_middleware(ResponseCachingMiddleware())
     mcp.add_middleware(
         RateLimitingMiddleware(
             max_requests_per_second=settings.tool_call_limit_per_second,

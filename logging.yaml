@@ -15,7 +15,7 @@ handlers:
   console:
     class: logging.StreamHandler
     level: INFO
-    formatter: standard
+    formatter: json
     stream: ext://sys.stdout
 
   file:
@@ -30,13 +30,13 @@ handlers:
 loggers:
   playmcp_viewer:
     level: DEBUG
-    handlers: [console, file]
+    handlers: [console]
     propagate: false
   fastmcp:
     level: INFO
-    handlers: [console, file]
+    handlers: [console]
     propagate: false
 
 root:
   level: INFO
-  handlers: [console, file]
+  handlers: [console]
