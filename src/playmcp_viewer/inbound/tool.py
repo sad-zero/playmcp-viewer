@@ -15,7 +15,7 @@ mcp: FastMCP = DIContainer().mcp()
 
 
 async def find_mcp_servers(
-    cond: Literal["TOOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
+    cond: Literal["TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
     order_by: Literal["asc", "desc"],
     top_n: int,
     ctx: Context = CurrentContext(),
@@ -24,7 +24,7 @@ async def find_mcp_servers(
     Retrieve a list of MCP servers registered on the Kakao PlayMCP platform, sorted by the specified condition and order.
 
     Tool Parameters:
-        cond: The field to sort by. One of "TOOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", or "CREATED_AT".
+        cond: The field to sort by. One of "TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", or "CREATED_AT".
         order_by: Sorting direction. Must be "asc" for ascending or "desc" for descending.
         top_n: Number of top MCP servers to return.
 
