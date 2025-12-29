@@ -7,8 +7,9 @@ ARG ENVIRONMENT
 WORKDIR /app
 COPY src src
 
-COPY ${ENVIRONMENT}.env ./.env
+COPY ${ENVIRONMENT}.env* .
 COPY ${ENVIRONMENT}.fastmcp.json fastmcp.json
+RUN mv ${ENVIRONMENT}.env .env | true
 
 COPY README.md README.md
 COPY logging.yaml logging.yaml
@@ -24,11 +25,13 @@ COPY --from=builder /bin/ /bin/
 COPY --from=builder /app /app
 
 WORKDIR /app
-RUN mkdir -p ./logs
+RUN mkdir -p ./logs | true
 
 RUN useradd -m -u 10001 runneruser
 RUN chown -R runneruser:runneruser /app
 USER 10001
 
+ENV PORT=8000
+EXPOSE ${PORT}
 ENTRYPOINT ["uv", "run", "fastmcp", "run"]
 CMD []
