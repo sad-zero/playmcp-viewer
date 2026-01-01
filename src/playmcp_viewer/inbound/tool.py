@@ -18,6 +18,7 @@ async def find_mcp_servers(
     cond: Literal["TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
     order_by: Literal["asc", "desc"],
     top_n: int,
+    developer: str | None = None,
     ctx: Context = CurrentContext(),
 ) -> list[PlayMCPServer]:
     """
@@ -27,7 +28,7 @@ async def find_mcp_servers(
         cond: The field to sort by. One of "TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", or "CREATED_AT".
         order_by: Sorting direction. Must be "asc" for ascending or "desc" for descending.
         top_n: Number of top MCP servers to return.
-
+        developer: Developer name to filter by. If not provided, all MCP servers will be returned.
     Returns:
         A list of PlayMCPServer objects, each containing:
             url: URL of the MCP server.
@@ -58,6 +59,12 @@ async def find_mcp_servers(
 
     if order_by == "asc":
         playmcp_contents = playmcp_contents[::-1]
+    if developer:
+        playmcp_contents = [
+            content
+            for content in playmcp_contents
+            if content.developer_name == developer
+        ]
 
     playmcp_contents = playmcp_contents[:top_n]
 
