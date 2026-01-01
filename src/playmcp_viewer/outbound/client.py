@@ -2,7 +2,7 @@ import httpx
 import logging
 
 from playmcp_viewer.config import Settings
-from playmcp_viewer.outbound.dto import PlaymcpListResponse
+from playmcp_viewer.outbound.dto import PlaymcpListContentResponse, PlaymcpListResponse
 
 settings = Settings()
 
@@ -46,6 +46,45 @@ async def get_playmcp_list(
             raise RuntimeError("request fails")
 
         resp = PlaymcpListResponse.model_validate(client_resp.json())
+    logger.info(
+        "response is converted",
+        extra={
+            "trace_id": trace_id,
+            "response": resp.model_dump(),
+        },
+    )
+    return resp
+
+
+async def get_playmcp_server(
+    trace_id: str,
+    server_id: str,
+) -> PlaymcpListContentResponse:
+    path = f"/api/v1/mcps/{server_id}"
+    async with httpx.AsyncClient(base_url=settings.kakao_playmcp_endpoint) as client:
+        client_resp = await client.get(url=path)
+        if client_resp.is_success:
+            logger.info(
+                "request successes",
+                extra={
+                    "trace_id": trace_id,
+                    "base_url": settings.kakao_playmcp_endpoint,
+                    "path": path,
+                },
+            )
+        else:
+            logger.warning(
+                "request fails",
+                extra={
+                    "trace_id": trace_id,
+                    "base_url": settings.kakao_playmcp_endpoint,
+                    "path": path,
+                    "response": client_resp.text,
+                },
+            )
+            raise RuntimeError("request fails")
+
+        resp = PlaymcpListContentResponse.model_validate(client_resp.json())
     logger.info(
         "response is converted",
         extra={

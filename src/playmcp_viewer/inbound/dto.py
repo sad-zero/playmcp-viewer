@@ -3,9 +3,10 @@ from typing import Self
 from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 
 from playmcp_viewer.config import Settings
-from playmcp_viewer.outbound.dto import PlaymcpListContentResponse 
+from playmcp_viewer.outbound.dto import PlaymcpListContentResponse
 
 settings = Settings()
+
 
 class PlayMCPServer(BaseModel):
     """MCP Server registered in Playmcp hub.
@@ -44,6 +45,7 @@ class PlayMCPServer(BaseModel):
             monthly_tool_call_count=server.monthly_tool_call_count,
             total_tool_call_count=server.total_tool_call_count,
         )
+
 
 class PlayMCPServerBriefInfo(BaseModel):
     """MCP Server registered in Playmcp hub.
