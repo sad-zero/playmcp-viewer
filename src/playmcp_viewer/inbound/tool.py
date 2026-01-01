@@ -1,13 +1,14 @@
 import asyncio
 from typing import Literal
+from collections import defaultdict
+
 from fastmcp import FastMCP
 from fastmcp.server.context import Context
 from fastmcp.dependencies import CurrentContext
 
 from playmcp_viewer.config import DIContainer, Settings
-
-from playmcp_viewer.inbound.dto import PlayMCPServer
 from playmcp_viewer.outbound.client import get_playmcp_list
+from playmcp_viewer.inbound.dto import DeveloperInfo, PlayMCPServer
 from playmcp_viewer.outbound.dto import PlaymcpListContentResponse, PlaymcpListResponse
 
 settings = Settings()
@@ -81,3 +82,36 @@ async def find_mcp_servers(
         for content in playmcp_contents
     ]
     return resp
+
+
+async def group_by_developer(
+    developer: str | None = None,
+    ctx: Context = CurrentContext(),
+) -> list[DeveloperInfo]:
+    """
+    Find developers and their MCP servers registered in Playmcp hub.
+
+    Tool Parameters:
+        developer: Developer name to filter by. If not provided, all developers will be returned.
+    Returns:
+        A list of DeveloperInfo objects, each containing:
+            name: Developer name
+            mcp_servers: MCP servers registered by the developer
+    """
+    mcp_servers: list[PlayMCPServer] = await find_mcp_servers(
+        cond="TOTAL_TOOL_CALL_COUNT",
+        order_by="desc",
+        top_n=1_000,
+        developer=developer,
+        ctx=ctx,
+    )
+    developer_infos: dict[str, list[PlayMCPServer]] = defaultdict(list)
+    for mcp_server in mcp_servers:
+        developer_infos[mcp_server.developer].append(mcp_server)
+    return [
+        DeveloperInfo(
+            name=developer,
+            mcp_servers=mcp_servers,
+        )
+        for developer, mcp_servers in developer_infos.items()
+    ]
