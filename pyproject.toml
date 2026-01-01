@@ -1,6 +1,6 @@
 [project]
 name = "playmcp-viewer"
-version = "0.2.0"
+version = "0.2.1"
 description = "PlayMCP Viewer."
 readme = "README.md"
 license = { text = "MIT" }
