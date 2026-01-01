@@ -17,9 +17,9 @@ mcp: FastMCP = DIContainer().mcp()
 
 async def find_mcp_servers(
     cond: Literal["TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
-    order_by: Literal["asc", "desc"],
-    top_n: int,
+    top_n: int | None = None,
     developer: str | None = None,
+    order_by: Literal["asc", "desc"] = "desc",
     ctx: Context = CurrentContext(),
 ) -> list[PlayMCPServer]:
     """
@@ -28,7 +28,7 @@ async def find_mcp_servers(
     Tool Parameters:
         cond: The field to sort by. One of "TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", or "CREATED_AT".
         order_by: Sorting direction. Must be "asc" for ascending or "desc" for descending.
-        top_n: Number of top MCP servers to return.
+        top_n: Number of top MCP servers to return. If not specified, all servers will be returned.
         developer: Developer name to filter by. If not provided, all MCP servers will be returned.
     Returns:
         A list of PlayMCPServer objects, each containing:
@@ -86,6 +86,8 @@ async def find_mcp_servers(
 
 async def group_by_developer(
     developer: str | None = None,
+    min_mcp_server_count: int | None = None,
+    order_by: Literal["asc", "desc"] = "desc",
     ctx: Context = CurrentContext(),
 ) -> list[DeveloperInfo]:
     """
@@ -93,6 +95,8 @@ async def group_by_developer(
 
     Tool Parameters:
         developer: Developer name to filter by. If not provided, all developers will be returned.
+        min_mcp_server_count: Only include developers who have at least this many registered MCP servers. If not specified, all developers are included.
+        order_by: Determines the sort order of developers by the number of MCP servers they have registered. Accepts "asc" for ascending order or "desc" for descending order.
     Returns:
         A list of DeveloperInfo objects, each containing:
             name: Developer name
@@ -101,17 +105,22 @@ async def group_by_developer(
     mcp_servers: list[PlayMCPServer] = await find_mcp_servers(
         cond="TOTAL_TOOL_CALL_COUNT",
         order_by="desc",
-        top_n=1_000,
         developer=developer,
         ctx=ctx,
     )
     developer_infos: dict[str, list[PlayMCPServer]] = defaultdict(list)
     for mcp_server in mcp_servers:
         developer_infos[mcp_server.developer].append(mcp_server)
-    return [
+    resp = [
         DeveloperInfo(
             name=developer,
             mcp_servers=mcp_servers,
         )
         for developer, mcp_servers in developer_infos.items()
     ]
+
+    if min_mcp_server_count:
+        resp = [x for x in resp if len(x.mcp_servers) >= min_mcp_server_count]
+    
+    resp = sorted(resp, key=lambda x: len(x.mcp_servers), reverse="desc" == order_by)
+    return resp
