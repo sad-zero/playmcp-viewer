@@ -3,7 +3,7 @@ from typing import Self
 from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 
 from playmcp_viewer.config import Settings
-from playmcp_viewer.outbound.dto import PlaymcpListContentResponse
+from playmcp_viewer.outbound.dto import PlaymcpDetailResponse
 
 settings = Settings()
 
@@ -34,7 +34,7 @@ class PlayMCPServer(BaseModel):
     total_tool_call_count: int = Field(description="total tool call count")
 
     @classmethod
-    def of(cls, server: PlaymcpListContentResponse) -> Self:
+    def of(cls, server: PlaymcpDetailResponse) -> Self:
         return cls(
             id=server.id,
             url=f"{settings.kakao_playmcp_endpoint}/mcp/{server.id}",

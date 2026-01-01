@@ -14,7 +14,7 @@ from playmcp_viewer.inbound.dto import (
 )
 from playmcp_viewer.config import DIContainer, Settings
 from playmcp_viewer.outbound.client import get_playmcp_list
-from playmcp_viewer.outbound.dto import PlaymcpListContentResponse, PlaymcpListResponse
+from playmcp_viewer.outbound.dto import PlaymcpDetailResponse, PlaymcpListResponse
 
 settings = Settings()
 mcp: FastMCP = DIContainer().mcp()
@@ -64,10 +64,7 @@ async def find_mcp_servers(
 
     playmcp_contents = playmcp_contents[:top_n]
 
-    resp = [
-        PlayMCPServer.of(content)
-        for content in playmcp_contents
-    ]
+    resp = [PlayMCPServer.of(content) for content in playmcp_contents]
     return resp
 
 
@@ -89,15 +86,11 @@ async def group_by_developer(
             name: Developer name
             mcp_servers: MCP servers registered by the developer
     """
-    playmcp_contents: list[PlaymcpListContentResponse] = await _find_mcp_servers(
+    playmcp_contents: list[PlaymcpDetailResponse] = await _find_mcp_servers(
         cond="TOTAL_TOOL_CALL_COUNT",
         ctx=ctx,
     )
-    mcp_servers = [
-        PlayMCPServer.of(content)
-        for content
-        in playmcp_contents
-    ]
+    mcp_servers = [PlayMCPServer.of(content) for content in playmcp_contents]
     developer_infos: dict[str, list[PlayMCPServerBriefInfo]] = defaultdict(list)
     for mcp_server in mcp_servers:
         brief_info = PlayMCPServerBriefInfo.of(mcp_server)
@@ -123,9 +116,9 @@ async def group_by_developer(
 async def _find_mcp_servers(
     cond: str,
     ctx: Context = CurrentContext(),
-) -> list[PlaymcpListContentResponse]:
+) -> list[PlaymcpDetailResponse]:
     page: int = 0
-    playmcp_contents: list[PlaymcpListContentResponse] = []
+    playmcp_contents: list[PlaymcpDetailResponse] = []
     while True:
         playmcp_resp: PlaymcpListResponse = await get_playmcp_list(
             trace_id=ctx.request_id,
