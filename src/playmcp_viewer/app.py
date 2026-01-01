@@ -1,6 +1,7 @@
 import logging
 
 from fastmcp import FastMCP
+from fastmcp.tools.tool import Tool
 from fastmcp.server.middleware.timing import TimingMiddleware
 from fastmcp.server.middleware.logging import LoggingMiddleware
 from fastmcp.server.middleware.caching import ResponseCachingMiddleware
@@ -8,7 +9,7 @@ from fastmcp.server.middleware.rate_limiting import RateLimitingMiddleware
 from fastmcp.server.middleware.error_handling import ErrorHandlingMiddleware
 
 from playmcp_viewer.config import DIContainer, Settings, configure_log
-from playmcp_viewer.inbound.tool import find_mcp_servers
+from playmcp_viewer.inbound import find_mcp_servers, group_by_developer
 
 
 def mcp() -> FastMCP:
@@ -28,7 +29,8 @@ def mcp() -> FastMCP:
     mcp: FastMCP = DIContainer().mcp()
 
     # tools
-    mcp.tool(find_mcp_servers)
+    mcp.add_tool(Tool.from_function(find_mcp_servers))
+    mcp.add_tool(Tool.from_function(group_by_developer))
 
     # middlewares.
     mcp.add_middleware(
@@ -42,7 +44,6 @@ def mcp() -> FastMCP:
             logger=logging.getLogger("playmcp_viewer.middleware.timing"),
         )
     )
-    # TODO: log response even if caching.
     mcp.add_middleware(
         LoggingMiddleware(
             logger=logging.getLogger("playmcp_viewer.middleware.logging"),

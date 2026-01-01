@@ -23,3 +23,17 @@ class PlayMCPServer(BaseModel):
     thumbnail: HttpUrl = Field(description="MCP server thumbnail image")
     monthly_tool_call_count: int = Field(description="monthly tool call count")
     total_tool_call_count: int = Field(description="total tool call count")
+
+
+class DeveloperInfo(BaseModel):
+    """Developer information grouped by developer name.
+
+    Attributes:
+        name: Developer name
+        mcp_servers: MCP servers registered by the developer
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str = Field(description="Developer name")
+    mcp_servers: list[PlayMCPServer] = Field(description="Developer's MCP servers")
