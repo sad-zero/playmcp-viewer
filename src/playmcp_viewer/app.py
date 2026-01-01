@@ -8,8 +8,12 @@ from fastmcp.server.middleware.caching import ResponseCachingMiddleware
 from fastmcp.server.middleware.rate_limiting import RateLimitingMiddleware
 from fastmcp.server.middleware.error_handling import ErrorHandlingMiddleware
 
+from playmcp_viewer.inbound import (
+    find_mcp_servers,
+    group_by_developer,
+    find_mcp_server_by_id,
+)
 from playmcp_viewer.config import DIContainer, Settings, configure_log
-from playmcp_viewer.inbound import find_mcp_servers, group_by_developer
 
 
 def mcp() -> FastMCP:
@@ -31,6 +35,7 @@ def mcp() -> FastMCP:
     # tools
     mcp.add_tool(Tool.from_function(find_mcp_servers))
     mcp.add_tool(Tool.from_function(group_by_developer))
+    mcp.add_tool(Tool.from_function(find_mcp_server_by_id))
 
     # middlewares.
     mcp.add_middleware(
