@@ -82,6 +82,8 @@ async def get_playmcp_server(
                     "response": client_resp.text,
                 },
             )
+            if client_resp.status_code == 404:
+                return None
             raise RuntimeError("request fails")
 
         resp = PlaymcpDetailResponse.model_validate(client_resp.json())
