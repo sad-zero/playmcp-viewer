@@ -10,10 +10,10 @@ class PlaymcpListResponse(BaseModel):
     page: int
     total_pages: int
     total_elements: Annotated[int, BeforeValidator(int)]
-    content: list["PlaymcpListContentResponse"]
+    content: list["PlaymcpDetailResponse"]
 
 
-class PlaymcpListContentResponse(BaseModel):
+class PlaymcpDetailResponse(BaseModel):
     model_config = ConfigDict(frozen=True, alias_generator=to_camel)
 
     id: str
@@ -21,26 +21,26 @@ class PlaymcpListContentResponse(BaseModel):
     description: str
     status: str
     starter_messages: list[str]
-    formatted_tools: list["PlaymcpListFormattedTool"]
+    formatted_tools: list["PlaymcpFormattedTool"]
     monthly_tool_call_count: Annotated[int, BeforeValidator(int)]
     total_tool_call_count: Annotated[int, BeforeValidator(int)]
     identify_name: str
     applicable_ai_service_scope: str = Field(alias="applicableAIServiceScope")
     featured_level: int
-    image: "PlaymcpListContentImage"
+    image: "PlaymcpContentImage"
     developer_name: str
     auth_config_summary: dict
 
 
-class PlaymcpListFormattedTool(BaseModel):
+class PlaymcpFormattedTool(BaseModel):
     model_config = ConfigDict(frozen=True, alias_generator=to_camel)
 
     name: str
     description: str | None
-    parameters: list["PlaymcpListFormattedToolParameter"]
+    parameters: list["PlaymcpFormattedToolParameter"]
 
 
-class PlaymcpListFormattedToolParameter(BaseModel):
+class PlaymcpFormattedToolParameter(BaseModel):
     model_config = ConfigDict(frozen=True, alias_generator=to_camel)
 
     name: str
@@ -49,7 +49,7 @@ class PlaymcpListFormattedToolParameter(BaseModel):
     required: bool
 
 
-class PlaymcpListContentImage(BaseModel):
+class PlaymcpContentImage(BaseModel):
     model_config = ConfigDict(frozen=True, alias_generator=to_camel)
 
     path: str

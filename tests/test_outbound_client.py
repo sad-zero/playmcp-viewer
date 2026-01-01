@@ -3,7 +3,7 @@ import uuid
 import pytest
 
 from playmcp_viewer.outbound.client import get_playmcp_list
-from playmcp_viewer.outbound.dto import PlaymcpListContentResponse, PlaymcpListResponse
+from playmcp_viewer.outbound.dto import PlaymcpDetailResponse, PlaymcpListResponse
 
 
 @pytest.mark.asyncio
@@ -16,7 +16,7 @@ async def test_get_playmcp_list(sort_by: str):
 
     # when
     page = 0
-    total_contents: list[PlaymcpListContentResponse] = []
+    total_contents: list[PlaymcpDetailResponse] = []
     while True:
         resp: PlaymcpListResponse = await get_playmcp_list(
             trace_id=trace_id,
