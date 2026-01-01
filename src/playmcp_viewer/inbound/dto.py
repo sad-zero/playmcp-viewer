@@ -11,6 +11,7 @@ class PlayMCPServer(BaseModel):
     """MCP Server registered in Playmcp hub.
 
     Attributes:
+        id: MCP server id
         url: MCP server link
         name: MCP server name
         description: MCP server description
@@ -22,6 +23,7 @@ class PlayMCPServer(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
+    id: str = Field(description="MCP server id")
     url: HttpUrl = Field(description="MCP server Link")
     name: str = Field(description="MCP server name")
     description: str = Field(description="MCP server description")
@@ -33,6 +35,7 @@ class PlayMCPServer(BaseModel):
     @classmethod
     def of(cls, server: PlaymcpListContentResponse) -> Self:
         return cls(
+            id=server.id,
             url=f"{settings.kakao_playmcp_endpoint}/mcp/{server.id}",
             name=server.name,
             description=server.description,
@@ -46,18 +49,21 @@ class PlayMCPServerBriefInfo(BaseModel):
     """MCP Server registered in Playmcp hub.
 
     Attributes:
+        id: MCP server id
         url: MCP server link
         name: MCP server name
     """
 
     model_config = ConfigDict(frozen=True)
 
+    id: str = Field(description="MCP server id")
     url: HttpUrl = Field(description="MCP server Link")
     name: str = Field(description="MCP server name")
 
     @classmethod
     def of(cls, mcp_server: PlayMCPServer) -> Self:
         return cls(
+            id=mcp_server.id,
             url=mcp_server.url,
             name=mcp_server.name,
         )
