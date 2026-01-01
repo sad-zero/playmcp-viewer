@@ -36,7 +36,7 @@ class PlaymcpListFormattedTool(BaseModel):
     model_config = ConfigDict(frozen=True, alias_generator=to_camel)
 
     name: str
-    description: str
+    description: str | None
     parameters: list["PlaymcpListFormattedToolParameter"]
 
 
