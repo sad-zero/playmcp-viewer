@@ -162,19 +162,23 @@ class PlayMCPServerDetail(BaseModel):
 
 
 class PlayMCPServerBriefInfo(BaseModel):
-    """MCP Server registered in Playmcp hub.
+    """Brief information about an MCP Server registered in PlayMCP hub.
 
     Attributes:
         id: MCP server id
         url: MCP server link
         name: MCP server name
+        is_active: Whether the MCP server is considered active (monthly_tool_call_count >= 10)
     """
 
     model_config = ConfigDict(frozen=True)
 
     id: str = Field(description="MCP server id")
-    url: HttpUrl = Field(description="MCP server Link")
+    url: HttpUrl = Field(description="MCP server link")
     name: str = Field(description="MCP server name")
+    is_active: bool = Field(
+        description="True if monthly_tool_call_count >= 10, else False"
+    )
 
     @classmethod
     def of(cls, mcp_server: PlayMCPServer) -> Self:
@@ -182,6 +186,7 @@ class PlayMCPServerBriefInfo(BaseModel):
             id=mcp_server.id,
             url=mcp_server.url,
             name=mcp_server.name,
+            is_active=mcp_server.monthly_tool_call_count >= 10,
         )
 
 

@@ -2,10 +2,10 @@ import asyncio
 from typing import Literal
 from collections import defaultdict
 
-from fastmcp import FastMCP
 from fastmcp.server.context import Context
 from fastmcp.dependencies import CurrentContext
 from fastmcp.exceptions import ValidationError, NotFoundError
+from mcp.types import Content
 
 from playmcp_viewer.inbound.dto import (
     DeveloperInfo,
@@ -13,18 +13,16 @@ from playmcp_viewer.inbound.dto import (
     PlayMCPServerDetail,
     PlayMCPServerBriefInfo,
 )
-from playmcp_viewer.config import DIContainer, Settings
 from playmcp_viewer.outbound.client import get_playmcp_list, get_playmcp_server
 from playmcp_viewer.outbound.dto import PlaymcpDetailResponse, PlaymcpListResponse
-
-settings = Settings()
-mcp: FastMCP = DIContainer().mcp()
 
 
 async def find_mcp_servers(
     cond: Literal["TOTAL_TOOL_CALL_COUNT", "FEATURED_LEVEL", "CREATED_AT"],
     top_n: int,
     developer: str | None = None,
+    min_monthly_tool_call_count: int | None = None,
+    min_total_tool_call_count: int | None = None,
     order_by: Literal["asc", "desc"] = "desc",
     ctx: Context = CurrentContext(),
 ) -> list[PlayMCPServer]:
@@ -36,6 +34,9 @@ async def find_mcp_servers(
         order_by: Sorting direction. Must be "asc" for ascending or "desc" for descending.
         top_n: The maximum number of MCP servers to return (up to 50). If not specified, all servers will be returned.
         developer: Developer name to filter by. If not provided, all MCP servers will be returned.
+        min_monthly_tool_call_count: Minimum monthly tool call count to filter MCP servers. If not provided, no filtering is applied.
+        min_total_tool_call_count: Minimum total tool call count to filter MCP servers. If not provided, no filtering is applied.
+
     Returns:
         A list of PlayMCPServer objects, each containing:
             url: URL of the MCP server.
@@ -54,14 +55,26 @@ async def find_mcp_servers(
         ctx,
     )
 
-    if order_by == "asc":
-        playmcp_contents = playmcp_contents[::-1]
     if developer:
         playmcp_contents = [
             content
             for content in playmcp_contents
             if content.developer_name == developer
         ]
+    if min_monthly_tool_call_count:
+        playmcp_contents = [
+            content
+            for content in playmcp_contents
+            if content.monthly_tool_call_count >= min_monthly_tool_call_count
+        ]
+    if min_total_tool_call_count:
+        playmcp_contents = [
+            content
+            for content in playmcp_contents
+            if content.total_tool_call_count >= min_total_tool_call_count
+        ]
+    if order_by == "asc":
+        playmcp_contents = playmcp_contents[::-1]
 
     playmcp_contents = playmcp_contents[:top_n]
 
@@ -72,6 +85,7 @@ async def find_mcp_servers(
 async def group_by_developer(
     developer: str | None = None,
     min_mcp_server_count: int | None = None,
+    is_active: bool | None = None,
     order_by: Literal["asc", "desc"] = "desc",
     ctx: Context = CurrentContext(),
 ) -> list[DeveloperInfo]:
@@ -79,9 +93,10 @@ async def group_by_developer(
     Find developers and their MCP servers registered in Playmcp hub.
 
     Tool Parameters:
-        developer: Developer name to filter by. If not provided, all developers will be returned.
-        min_mcp_server_count: Only include developers who have at least this many registered MCP servers. If not specified, all developers are included.
-        order_by: Determines the sort order of developers by the number of MCP servers they have registered. Accepts "asc" for ascending order or "desc" for descending order.
+        developer: (optional) Filter by developer name. If not provided, include all developers.
+        min_mcp_server_count: (optional) Minimum number of MCP servers a developer must have registered to be included. Defaults to including all.
+        is_active: (optional) If True, only include developers where at least one of their MCP servers has a monthly tool call count greater than 10. If False, include only those where none of their MCP servers exceeds 10. If not provided, include all developers.
+        order_by: (optional) Sort order for developers by their registered MCP server count. "asc" for ascending, "desc" for descending (default: "desc").
     Returns:
         A list of DeveloperInfo objects, each containing:
             name: Developer name
@@ -109,6 +124,14 @@ async def group_by_developer(
 
     if min_mcp_server_count:
         resp = [x for x in resp if len(x.mcp_servers) >= min_mcp_server_count]
+
+    if is_active is False:
+        resp = [
+            x for x in resp if not any(server.is_active for server in x.mcp_servers)
+        ]
+
+    if is_active is True:
+        resp = [x for x in resp if any(server.is_active for server in x.mcp_servers)]
 
     resp = sorted(resp, key=lambda x: len(x.mcp_servers), reverse="desc" == order_by)
     return resp
